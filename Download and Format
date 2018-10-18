@@ -1,0 +1,50 @@
+from urllib.request import urlretrieve
+
+URL_PATH = 'https://s3.amazonaws.com/tcmg476/http_access_log'
+LOCAL_FILE = 'local_copy.log'
+
+# Use urlretrieve() to fetch a remote copy and save into the local file path
+local_file, headers = urlretrieve(URL_PATH, LOCAL_FILE)
+
+# Alt.: supply an anonmymous callback function to print a simple progress bar to screen
+local_file, headers = urlretrieve(URL_PATH, LOCAL_FILE, lambda x,y,z: print('.', end='', flush=True))
+
+# Alt. 2: a progress bar with reduced output (every 1000 blocks)
+local_file, headers = urlretrieve(URL_PATH, LOCAL_FILE, lambda x,y,z: print('.', end='', flush=True) if x % 100 == 0 else False)
+
+
+
+def readDatabase(theInventory):
+    flag1 = True
+    
+    while(flag1 == True):
+        try:
+            #use file to store for later use in creating your output file
+            file = open(input(str("Enter the name of the file: ")),"r")
+            content = file.readlines()
+            list1 = []
+            
+            #builds 2D list, all correct
+            for line in content:
+                line = line.strip()
+                line = line.split(',')
+                list1.append(line)
+                
+            #start pulling out elements and assign them for keys
+            for element in list1:
+                #key of the dictionary
+                key = (element[0] + ", " + element[1])
+                #values of the dictionary
+                values = [element[2], element[3], element[4]]
+                
+                #this is how you build a dictionary
+                theInventory.setdefault(key, [])
+                theInventory[key].append(values)
+            
+            
+            flag1 = False
+        #prompting user to enter correct file name
+        except FileNotFoundError:
+            print("Error reading database")
+            flag1 = True
+main()
