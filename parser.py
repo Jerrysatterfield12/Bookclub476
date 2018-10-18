@@ -37,11 +37,14 @@ def count_names(file_data, begin, end, sex):
     
     
 def main():
-    
+
+    import re    
     from urllib.request import urlretrieve
     
     URL_PATH = 'https://s3.amazonaws.com/tcmg476/http_access_log'
     LOCAL_FILE = 'http.log'
+    LOCAL_FILE = 'sample.log'
+    file = open(LOCAL_FILE)
     
     print('Downloading Log')
     
@@ -49,12 +52,51 @@ def main():
     #local_file, headers = urlretrieve(URL_PATH, LOCAL_FILE)    # UNCOMMENTED SO FILE DOESN'T REDOWNLOAD EVERY TIME WE TEST
     # Download progress
     print('0% ', end='')
-    local_file, headers = urlretrieve(URL_PATH, LOCAL_FILE, lambda x,y,z: print('=', end='', flush=True) if x % 100 == 0 else False)
+    #local_file, headers = urlretrieve(URL_PATH, LOCAL_FILE, lambda x,y,z: print('=', end='', flush=True) if x % 100 == 0 else False)
     print(' 100%')     
     print('Download Complete')
     
-    for line in open(LOCAL_FILE):
-        print(line)    
+    # Variable Declaration
+    totalLines = 0
+    statusUnsuccessful = 0
+    statusRedirect = 0
+    requestedFiles = set([])
+    allFileRequests = []
+    regex = re.compile(".*\[([^:]*):(.*) \-[0-9]{4}\] \"([A-Z]+) (.+?)( HTTP.*\"|\") ([2-5]0[0-9]) .*")
+    
+    
+    for line in file:
+        totalLines+=1   
+        line = file.readline()
+        errors = []
+        data = regex.split(line)
+        #print(line)
+        print(data)
+        # Sanity check the line -- there should be 7 elements in the list (remember that index 0 has the whole string)
+        if not data or len(data) < 7:
+          print("Error parsing line! Log entry added to ERRORS[] list...")
+          errors.append(line)
+        
+        # data[0] = nothing?
+        # data[1] = request date (dd/Mmm/yyyy)
+        # data[2] = request time (hh:mm:ss)
+        # data[3] = request type. GET, POST, etc.
+        # data[4] = requested file
+        # data[5] = http version
+        # data[6] = http status code
+        # data[7] = idk
+        
+        if data[6][:1] == '4':      #Counts Unsuccessful (4xx) Status Codes
+            statusUnsuccessful+=1
+            
+        elif data[6][:1] == '3':    #Counts Redirected (3xx) Status Codes
+            statusRedirect+=1
+        
+        requestedFiles.add(data[4])
+    
+    print("\nTotal requests: " + str(totalLines))
+    print("Unsuccessful requests: " + str(statusUnsuccessful))
+    print("Redirected requests: " + str(statusRedirect))
     
     
     #Open the data file and save the data in a list called file_data. 
