@@ -33,8 +33,8 @@ def main():
     dailyRequests = {}
     regex = re.compile(".*\[([^:]*):(.*) \-[0-9]{4}\] \"([A-Z]+) (.+?)( HTTP.*\"|\") ([2-5]0[0-9]) .*")
 
-    print("\nWorking:")
-    print("\n0% [", end='')    
+    print("\n\nParsing:")
+    print("0% [", end='')    
     for line in file:
         totalLines+=1
         errors = []
@@ -83,7 +83,7 @@ def main():
     #print("nummonths: " + str(len(monthlyRequests)))
 
     print('] 100%') 
-    print('\n')   
+    print('Parsing Complete\n\n')   
     
     fileRequestData = sorted(fileRequests.items(), key=operator.itemgetter(1))
     print("\n1.  Total requests: " + str(totalLines))
