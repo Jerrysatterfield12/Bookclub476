@@ -1,0 +1,88 @@
+    Sample Python code for fetching a file from the Internet to a local copy: https://gist.github.com/amikeal/4e2847e3977a787e071e81014fe43390
+
+from urllib.request import urlretrieve
+
+URL_PATH = 'https://s3.amazonaws.com/tcmg476/http_access_log'
+LOCAL_FILE = 'local_copy.log'
+
+# Use urlretrieve() to fetch a remote copy and save into the local file path
+local_file, headers = urlretrieve(URL_PATH, LOCAL_FILE)
+
+# Alt.: supply an anonmymous callback function to print a simple progress bar to screen
+local_file, headers = urlretrieve(URL_PATH, LOCAL_FILE, lambda x,y,z: print('.', end='', flush=True))
+
+# Alt. 2: a progress bar with reduced output (every 1000 blocks)
+local_file, headers = urlretrieve(URL_PATH, LOCAL_FILE, lambda x,y,z: print('.', end='', flush=True) if x % 100 == 0 else False)
+
+    Using Python to loop through each line in a file: https://gist.github.com/amikeal/8b4182edbabc4197fa2e44e2894ee059
+
+    Matching a string against a regex pattern: https://gist.github.com/amikeal/3944dd8eec5c72b6e19a5b36348c6553
+
+import re
+
+# a list to store errors from the parsing process
+ERRORS = []
+
+# Prepare the regex (this is independent from using the pattern, so it can happen outside a loop, e.g.)
+regex = re.compile(".*\[([^:]*):(.*) \-[0-9]{4}\] \"([A-Z]+) (.+?)( HTTP.*\"|\") ([2-5]0[0-9]) .*")
+
+# Call the split() method to get all the capture groups put in a list
+parts = regex.split(log_line)
+
+# Let's see what the regex grabbed...
+print parts
+
+# Sanity check the line -- there should be 7 elements in the list (remember that index 0 has the whole string)
+if not parts or len(parts) < 7:
+  print "Error parsing line! Log entry added to ERRORS[] list..."
+  errors.append(log_line)
+
+# Now we can do something with the parts we grabbed...
+
+    Using a Python dictionary to track quantities of things (like for instance, the number 
+    of times a particular filename has appeared in a logfile…): https://gist.github.com/amikeal/9f0f58ce1d0742b57ab9ac93c540f263
+    
+ import re
+
+# Initialize a dictionary to track the items
+#   The keys will be a unique string that represents the item,
+#   and the values will be a single int that tracks how many of the thing exists
+things = {}
+
+# Let's say we're counting the number of times that a particular filename appears in a log file
+for line in open('some_logfile.txt'):
+  
+  # Use the Regex module to split out the filename from the line
+  pieces = re.split('...awesome RegEx pattern here...', line)
+  
+  # Let's further say that we can get the filename part at the 4th list element
+  filename = pieces[3]
+  
+  #
+  # Now we need to use a little logic: if this is the first time we've seen this filename, 
+  #   then we need to add it to the 'things' dict. If we've already seen this filename
+  #   before, then we need to increment the counter (the int in the value) for that filename.
+  #
+  
+  # Check and see if a key that matches 'filename' exists using the 'in' operator
+  if filename in things:
+    # So we've already added this file -- let's increment the counter
+    things[filename] += 1
+  else:
+    # This is a new filename -- let's add it to the dictionary
+    things[filename] = 1
+    
+One last thing — the Python documentation for the `str` object methods: https://docs.python.org/3/library/stdtypes.html#string-methods
+This is where I got the cool `split()` method that will turn a string like this:
+
+  this is a Python 3 string
+  into a list like this:
+  ```['this', 'is', 'a', 'Python', '3', 'string']```
+  
+  How to write a list to a file with newlines in Python 3:
+  https://stackoverflow.com/questions/7138686/how-to-write-a-list-to-a-file-with-newlines-in-python3
+  
+  Reading and writing lists in to a file in Python:
+  https://stackabuse.com/reading-and-writing-lists-to-a-file-in-python/
+  
+  
